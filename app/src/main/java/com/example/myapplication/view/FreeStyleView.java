@@ -1,11 +1,15 @@
 package com.example.myapplication.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+
+import com.example.myapplication.R;
 
 public class FreeStyleView extends View {
     private Paint paint;
@@ -13,28 +17,41 @@ public class FreeStyleView extends View {
      * 需要绘制圆的半径
      */
     private int radius = 100;
+    /**
+     * 绘制圆的颜色
+     */
+    private int color = Color.RED;
 
     public FreeStyleView(Context context) {
         super(context);
-        init();
+        init(context,null);
     }
 
     public FreeStyleView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context,attrs);
     }
 
     public FreeStyleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
-    private void init() {
+    private void init(Context context, AttributeSet attrs) {
+        // 用代码新建的没有xml定义的属性
+        if (attrs != null){
+            // 处理属性（Android系统自带的属性我们不用定义即可使用，but还是要处理的）
+            // 这一步是解析属性，因为不这样操作通过循环我们也能拿到属性名字以及对应的值，但适配、以及获取资源不太易操作。
+            TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.FreeStyleView);
+            // 获取颜色，第一个参数是在 attr 定义的属性，系统做了处理，名称变成了FreeStyleView_color，
+            // 第二个参数是默认值
+            color = typedArray.getColor(R.styleable.FreeStyleView_color,color);
+        }
+
         paint = new Paint();
         // 设置画笔模式，FILL 填充，STROKE 描边
         paint.setStyle(Paint.Style.STROKE);
         // 设置画笔颜色
-        paint.setColor(Color.RED);
+        paint.setColor(color);
         // 设置画笔宽度，px 为单位，实际需要转换成 dp 值
         paint.setStrokeWidth(8);
     }
