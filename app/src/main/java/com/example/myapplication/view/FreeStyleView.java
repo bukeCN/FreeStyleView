@@ -59,6 +59,7 @@ public class FreeStyleView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(measureWidth(widthMeasureSpec),measureHieght(heightMeasureSpec));
+        Log.i("sun","View_onMeasure");
     }
 
     private int measureWidth(int widthMeasureSpec) {
@@ -111,5 +112,6 @@ public class FreeStyleView extends View {
         super.onDraw(canvas);
         // 绘制一个圆形
         canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius, paint);
+        Log.i("sun","View_onDraw");
     }
 }
