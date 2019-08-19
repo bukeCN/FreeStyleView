@@ -5,50 +5,180 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
     <com.example.myapplication.viewgroup.TagFlowView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试1"/>
-        <Button
-            android:layout_width="200dp"
-            android:layout_height="100dp"
-            android:text="测试2"/>
-        <Button
-            android:layout_width="300dp"
-            android:layout_height="100dp"
-            android:text="测试3"/>
+            android:text="sss"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试4"/>
+            android:text="sss"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试5"/>
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="100dp"
-            android:text="测试6"/>
+            android:text="sss"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试7"/>
+            android:text="sss"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试8"/>
+            android:text="sss"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试8"/>
+            android:text="sss"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:text="测试8"/>
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:text="sss"/>
     </com.example.myapplication.viewgroup.TagFlowView>
-
 </RelativeLayout>
