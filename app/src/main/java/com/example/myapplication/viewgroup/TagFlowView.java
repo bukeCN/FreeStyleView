@@ -9,9 +9,11 @@ import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.OverScroller;
 import android.widget.Scroller;
 
 /**
@@ -33,11 +35,24 @@ public class TagFlowView extends ViewGroup {
      * 判定拖动的最小像素值
      */
     private float mTouchSlop;
+    private int mOverscrollDistance;
 
     /**
-     * view 的高度
+     * view 内容的高度
      */
-    private int vieHeight;
+    private int viewContentHeight;
+    /**
+     * view 实际的高度
+     */
+    private int viewHeight;
+
+
+    private VelocityTracker mVelocityTracker;
+
+    // 系统给的最大触摸滑动速度
+    private int mMaximumVelocity;
+    // 系统给的最小触摸滑动速度
+    private int mMinimumVelocity;
 
 
     public TagFlowView(Context context) {
@@ -50,9 +65,14 @@ public class TagFlowView extends ViewGroup {
         init(context);
     }
 
-    private void init(Context context){
+    private void init(Context context) {
         mScroller = new Scroller(context);
-        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+
+        ViewConfiguration configuration = ViewConfiguration.get(context);
+        mTouchSlop = configuration.getScaledTouchSlop();
+        mOverscrollDistance = configuration.getScaledOverscrollDistance();
+        mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
+        mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
     }
 
     @Override
@@ -112,9 +132,8 @@ public class TagFlowView extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
 
         int width = getMeasuredWidth();
-        vieHeight = width;
         // 已经使用的高度
-
+        viewHeight = getMeasuredHeight();
         // 下一行开始的 top 位置
         int nextTopPoint = getPaddingTop();
 
@@ -126,10 +145,10 @@ public class TagFlowView extends ViewGroup {
         int childCount = getChildCount();
 
         MarginLayoutParams marginLayoutParams;
-        for (int i = 0;i < childCount;i++){
+        for (int i = 0; i < childCount; i++) {
             View child = getChildAt(i);
 
-            Log.e("sun",child.getLayoutParams().getClass().getName());
+            Log.e("sun", child.getLayoutParams().getClass().getName());
             marginLayoutParams = (MarginLayoutParams) child.getLayoutParams();
 
             int childWidth = child.getMeasuredWidth();
@@ -141,7 +160,7 @@ public class TagFlowView extends ViewGroup {
             int bottom = top + childHeight + marginLayoutParams.bottomMargin;
 
             // 是否需要换行
-            if (right > width){
+            if (right > width) {
                 left = getPaddingLeft() + marginLayoutParams.leftMargin;
                 top = top + childHeight + marginLayoutParams.topMargin;
                 right = left + childWidth + marginLayoutParams.rightMargin;
@@ -150,9 +169,10 @@ public class TagFlowView extends ViewGroup {
             }
             useWidth = right;
 
+            viewContentHeight = nextTopPoint;
 
-            Log.e("sun",i+"-"+top+"-"+right+"-"+width+"-"+nextTopPoint);
-            child.layout(left,top,right,bottom);
+            Log.e("sun", i + "-" + top + "-" + right + "-" + width + "-" + nextTopPoint);
+            child.layout(left, top, right, bottom);
         }
     }
 
@@ -160,19 +180,25 @@ public class TagFlowView extends ViewGroup {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int eventKey = ev.getAction();
         // 判断是何种事件
-        switch (eventKey){
+        switch (eventKey) {
             case MotionEvent.ACTION_DOWN:
                 // 记下按下的屏幕坐标
-                if (downPoint == null){
+                if (downPoint == null) {
                     downPoint = new PointF();
                 }
                 downPoint.x = ev.getRawX();
                 downPoint.y = ev.getRawY();
+
+                if (mVelocityTracker == null){
+                    mVelocityTracker = VelocityTracker.obtain();
+                }
+                mVelocityTracker.addMovement(ev);
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 float moveY = ev.getRawY();
                 float moveSlop = Math.abs(moveY - downPoint.y);
-                if (moveSlop > mTouchSlop){
+                if (moveSlop > mTouchSlop) {
                     return true;
                 }
                 break;
@@ -184,25 +210,36 @@ public class TagFlowView extends ViewGroup {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int eventKey = event.getAction();
-        switch (eventKey){
+        switch (eventKey) {
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getRawY();
-                Log.e("sun",moveY+"-"+downPoint.y+"-"+(downPoint.y - moveY));
-                Log.e("sun","TOP-"+getScrollY());
                 // 判断滑动的距离不能大于 view 的
                 int viewTopY = getScrollY();
                 // 用负号因为原始坐标是正常的坐标系
                 int moveDis = (int) (downPoint.y - moveY);
-
-                overScrollBy(0,(int) event.getRawY(),0,getScrollY(),0,getScrollRange(),0,moveDis,true);
-//                mScroller.startScroll(0,(int) downPoint.y,0,(int) event.getRawY());
+                Log.e("sun",getScrollY()+"-"+moveDis);
+                // 几个参数的意思：需要滑动 x 的距离，需滑动 y 的距离，x 已经滑动的值，y 已经滑动的值，
+                //      x 滑动的范围 ，y 滑动的范围，x 显示边缘效果时的最大值（待验证，可能是回弹间隙），y 显示边缘效果时的最大值（待验证，可能是回弹间隙）,执行完滚动之后是否继续处理后续事件(没用到的参数)
+                int rangY = viewContentHeight-viewHeight;
+                overScrollBy(0,moveDis,0,getScrollY(),0,rangY,0,0,true);
                 // 记录最后一次的坐标
                 downPoint.x = event.getRawX();
                 downPoint.y = event.getRawY();
                 return true;
             case MotionEvent.ACTION_UP:
                 // 当快速滑动时，使用 scroller 完成流程滑动
-//                mScroller.startScroll(0,(int) (downPoint.y),0,(int) (event.getRawY()));
+                mVelocityTracker.computeCurrentVelocity(1000,mMaximumVelocity);
+                float velocity = mVelocityTracker.getYVelocity();
+                if (velocity > mMinimumVelocity){
+                    mScroller.startScroll();
+                }
+
+
+//                int dis = (int) (downPoint.y - event.getRawY());
+//                mScroller.startScroll(0,(int) (downPoint.y),0,dis);
+//                invalidate();
+//                downPoint.x = event.getRawX();
+//                downPoint.y = event.getRawY();
                 break;
         }
         return super.onTouchEvent(event);
@@ -218,13 +255,33 @@ public class TagFlowView extends ViewGroup {
         return scrollRange;
     }
 
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY,
+                                  boolean clampedX, boolean clampedY) {
+        // Treat animating scrolls differently; see #computeScroll() for why.
+//        if (!mScroller.isFinished()) {
+//            final int oldX = mScrollX;
+//            final int oldY = mScrollY;
+//            mScrollX = scrollX;
+//            mScrollY = scrollY;
+//            invalidateParentIfNeeded();
+//            onScrollChanged(mScrollX, mScrollY, oldX, oldY);
+//            if (clampedY) {
+//                mScroller.springBack(mScrollX, mScrollY, 0, 0, 0, getScrollRange());
+//            }
+//        } else {
+            super.scrollTo(scrollX, scrollY);
+//        }
+
+//        awakenScrollBars();
+    }
 
     @Override
     public void computeScroll() {
         // 第三步，重写computeScroll()方法，并在其内部完成平滑滚动的逻辑
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
-            invalidate();
+            postInvalidate();
         }
     }
 
