@@ -29,7 +29,7 @@ public class TagFlowView extends ViewGroup {
     /**
      * 第一次按下的坐标
      */
-    private PointF downPoint;
+    private float lastY;
 
     /**
      * 判定拖动的最小像素值
@@ -171,7 +171,7 @@ public class TagFlowView extends ViewGroup {
 
             viewContentHeight = nextTopPoint;
 
-            Log.e("sun", i + "-" + top + "-" + right + "-" + width + "-" + nextTopPoint);
+//            Log.e("sun", i + "-" + top + "-" + right + "-" + width + "-" + nextTopPoint);
             child.layout(left, top, right, bottom);
         }
     }
@@ -183,21 +183,19 @@ public class TagFlowView extends ViewGroup {
         switch (eventKey) {
             case MotionEvent.ACTION_DOWN:
                 // 记下按下的屏幕坐标
-                if (downPoint == null) {
-                    downPoint = new PointF();
-                }
-                downPoint.x = ev.getRawX();
-                downPoint.y = ev.getRawY();
-
-                if (mVelocityTracker == null){
+                if (mVelocityTracker == null) {
                     mVelocityTracker = VelocityTracker.obtain();
                 }
-                mVelocityTracker.addMovement(ev);
 
+                // 如果 scroller 动画没停止，但是用户已经触摸，则该立刻停止
+                if (!mScroller.isFinished()) {
+                    mScroller.abortAnimation();
+                }
+                lastY = ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                float moveY = ev.getRawY();
-                float moveSlop = Math.abs(moveY - downPoint.y);
+                float moveY = ev.getY();
+                float moveSlop = Math.abs(moveY - lastY);
                 if (moveSlop > mTouchSlop) {
                     return true;
                 }
@@ -211,69 +209,46 @@ public class TagFlowView extends ViewGroup {
     public boolean onTouchEvent(MotionEvent event) {
         int eventKey = event.getAction();
         switch (eventKey) {
+            case MotionEvent.ACTION_DOWN:
+                break;
             case MotionEvent.ACTION_MOVE:
-                float moveY = event.getRawY();
-                // 判断滑动的距离不能大于 view 的
-                int viewTopY = getScrollY();
-                // 用负号因为原始坐标是正常的坐标系
-                int moveDis = (int) (downPoint.y - moveY);
-                Log.e("sun",getScrollY()+"-"+moveDis);
+                mVelocityTracker.addMovement(event);
+
+                float moveY = event.getY();
+                int moveDis = (int) (lastY - moveY);
                 // 几个参数的意思：需要滑动 x 的距离，需滑动 y 的距离，x 已经滑动的值，y 已经滑动的值，
                 //      x 滑动的范围 ，y 滑动的范围，x 显示边缘效果时的最大值（待验证，可能是回弹间隙），y 显示边缘效果时的最大值（待验证，可能是回弹间隙）,执行完滚动之后是否继续处理后续事件(没用到的参数)
-                int rangY = viewContentHeight-viewHeight;
-                overScrollBy(0,moveDis,0,getScrollY(),0,rangY,0,0,true);
+                overScrollBy(0, moveDis, 0, getScrollY(), 0, getRangY(), 0, 0, true);
                 // 记录最后一次的坐标
-                downPoint.x = event.getRawX();
-                downPoint.y = event.getRawY();
+                lastY = event.getY();
                 return true;
             case MotionEvent.ACTION_UP:
                 // 当快速滑动时，使用 scroller 完成流程滑动
-                mVelocityTracker.computeCurrentVelocity(1000,mMaximumVelocity);
+                mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                 float velocity = mVelocityTracker.getYVelocity();
-                if (velocity > mMinimumVelocity){
-                    mScroller.startScroll();
+                Log.e("sun", "速度" + velocity + "默认速度" + mMinimumVelocity);
+
+                if (Math.abs(velocity) > mMinimumVelocity) {
+                    mScroller.fling(0, getScrollY(), 0, (int) -velocity, 0, 0, 0, getRangY());
+//                    invalidate();
                 }
-
-
-//                int dis = (int) (downPoint.y - event.getRawY());
-//                mScroller.startScroll(0,(int) (downPoint.y),0,dis);
-//                invalidate();
-//                downPoint.x = event.getRawX();
-//                downPoint.y = event.getRawY();
+                mVelocityTracker.clear();
                 break;
         }
         return super.onTouchEvent(event);
     }
 
-    private int getScrollRange() {
-        int scrollRange = 0;
-        if (getChildCount() > 0) {
-            View child = getChildAt(0);
-            scrollRange = Math.max(0,
-                    child.getHeight() - (getHeight() - getPaddingBottom() - getPaddingTop()));
-        }
-        return scrollRange;
+    private int getRangY() {
+        return viewContentHeight - viewHeight;
     }
 
     @Override
     protected void onOverScrolled(int scrollX, int scrollY,
                                   boolean clampedX, boolean clampedY) {
-        // Treat animating scrolls differently; see #computeScroll() for why.
-//        if (!mScroller.isFinished()) {
-//            final int oldX = mScrollX;
-//            final int oldY = mScrollY;
-//            mScrollX = scrollX;
-//            mScrollY = scrollY;
-//            invalidateParentIfNeeded();
-//            onScrollChanged(mScrollX, mScrollY, oldX, oldY);
-//            if (clampedY) {
-//                mScroller.springBack(mScrollX, mScrollY, 0, 0, 0, getScrollRange());
-//            }
-//        } else {
-            super.scrollTo(scrollX, scrollY);
-//        }
 
-//        awakenScrollBars();
+        if (mScroller.isFinished()){
+            super.scrollTo(scrollX, scrollY);
+        }
     }
 
     @Override
